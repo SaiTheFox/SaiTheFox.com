@@ -3,6 +3,7 @@ let started = false, timer;
 let timeLeft, initialTime;
 let correct = 0, total = 0, combo = 0, bestCombo = 0;
 let wpmSamples = [], errorSamples = [];
+let totalWords = 0; 
 
 const el = id => document.getElementById(id);
 
@@ -38,14 +39,21 @@ function reset() {
     el('bestCombo').textContent = 0;
 
     el('textDisplay').innerHTML = '';
-    spans = [...buildPrompt(el('difficulty').value, +el('length').value)]
-        .map((c, i) => {
-            const s = document.createElement('span');
-            s.textContent = c;
-            if (i === 0) s.classList.add('current');
-            el('textDisplay').appendChild(s);
-            return s;
-        });
+    
+    const text = buildPrompt(el('difficulty').value, +el('length').value);
+    totalWords = text.trim().split(/\s+/).length; 
+    
+    if (el('wordCount')) {
+        el('wordCount').textContent = `0 / ${totalWords}`;
+    }
+
+    spans = [...text].map((c, i) => {
+        const s = document.createElement('span');
+        s.textContent = c;
+        if (i === 0) s.classList.add('current');
+        el('textDisplay').appendChild(s);
+        return s;
+    });
 
     setTimeout(() => document.addEventListener('keydown', keyHandler), 50);
 }
@@ -58,23 +66,36 @@ function startTimer() {
 
         const elapsed = initialTime - timeLeft;
         const wpm = Math.round((correct / 5) / (elapsed / 60) || 0);
-        wpmSamples.push(wpm);
+        wpmSamples.push({time: elapsed, wpm: wpm});
         el('wpm').textContent = wpm;
 
         if (timeLeft <= 0) finish();
     }, 1000);
 }
 
+/* -------- word count helper -------- */
+function updateWordCount() {
+    if (!el('wordCount')) return;
+    if (idx === 0) {
+        el('wordCount').textContent = `0 / ${totalWords}`;
+        return;
+    }
+    let spaces = spans.slice(0, idx).filter(span => span.textContent === ' ').length;
+    let currentWord = Math.min(spaces + 1, totalWords);
+    el('wordCount').textContent = `${currentWord} / ${totalWords}`;
+}
+
 /* -------- typing -------- */
 function keyHandler(e) {
+    // --- NEW: Immediately allow browser shortcuts (Ctrl+R, Ctrl+C, etc.) ---
+    if (e.ctrlKey || e.metaKey) return;
+
     if (!started) {
         started = true;
         startTimer();
     }
 
-    if (
-        ['Shift', 'Alt', 'Control', 'Meta', 'Enter', 'Tab'].includes(e.key)
-    ) return;
+    if (['Shift', 'Alt', 'Control', 'Meta', 'Enter', 'Tab'].includes(e.key)) return;
 
     if (e.key === 'Backspace') {
         if (idx > 0) {
@@ -83,11 +104,12 @@ function keyHandler(e) {
             spans[idx].classList.remove('correct', 'incorrect');
             spans[idx].classList.add('current');
             combo = 0;
+            updateWordCount();
         }
         return;
     }
 
-    e.preventDefault();
+    e.preventDefault(); // This no longer blocks Ctrl+R thanks to the check above!
 
     const s = spans[idx];
     if (!s) return finish();
@@ -111,41 +133,126 @@ function keyHandler(e) {
     el('combo').textContent = combo;
     el('bestCombo').textContent = bestCombo;
     el('accuracy').textContent = Math.round((correct / total) * 100);
+    
+    updateWordCount();
 
     if (idx >= spans.length) finish();
 }
 
 /* -------- consistency -------- */
 function consistencyScore() {
-    const avg = wpmSamples.reduce((a, b) => a + b, 0) / wpmSamples.length;
-    const variance = wpmSamples.reduce((a, b) => a + (b - avg) ** 2, 0) / wpmSamples.length;
+    if(wpmSamples.length === 0) return 0;
+    const avg = wpmSamples.reduce((a, b) => a + b.wpm, 0) / wpmSamples.length;
+    const variance = wpmSamples.reduce((a, b) => a + (b.wpm - avg) ** 2, 0) / wpmSamples.length;
     return Math.max(0, 100 - Math.sqrt(variance)).toFixed(0);
 }
 
 /* -------- graph -------- */
 function drawGraph() {
     const c = el('graph'), ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
+    
+    // Increased left padding to 40 so the numbers have room to breathe
+    const padX = 40; 
+    const padY = 30;
+    const maxWpm = Math.max(...wpmSamples.map(s => s.wpm), 1) * 1.1; 
+    const points = [];
 
-    const pad = 20;
-    const max = Math.max(...wpmSamples) * 1.1;
-
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
-    ctx.beginPath();
-    ctx.moveTo(pad, pad);
-    ctx.lineTo(pad, c.height - pad);
-    ctx.lineTo(c.width - pad, c.height - pad);
-    ctx.stroke();
-
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary');
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    wpmSamples.forEach((w, i) => {
-        const x = pad + (i / (wpmSamples.length - 1)) * (c.width - pad * 2);
-        const y = c.height - pad - (w / max) * (c.height - pad * 2);
-        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    // Pre-calculate all points
+    wpmSamples.forEach((sample, i) => {
+        const x = padX + (i / Math.max(wpmSamples.length - 1, 1)) * (c.width - padX * 2);
+        const y = c.height - padY - (sample.wpm / maxWpm) * (c.height - padY * 2);
+        points.push({x, y, wpm: sample.wpm, time: sample.time});
     });
-    ctx.stroke();
+
+    // --- NEW: Helper function to draw the base graph and labels ---
+    function drawBase() {
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        // Draw Axes
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#FF9A8B';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padX, padY);
+        ctx.lineTo(padX, c.height - padY);
+        ctx.lineTo(c.width - padX, c.height - padY);
+        ctx.stroke();
+
+        // Draw Y-Axis Numbers
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-light') || '#9a8c98';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        
+        ctx.fillText(Math.round(maxWpm), padX - 8, padY); // Top (Max)
+        ctx.fillText(Math.round(maxWpm / 2), padX - 8, c.height / 2); // Middle (Half)
+        ctx.fillText("0", padX - 8, c.height - padY); // Bottom (Zero)
+
+        if (points.length === 0) return;
+
+        // Draw Line
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary') || '#FF6A88';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+        ctx.stroke();
+    }
+
+    // Draw the initial graph
+    drawBase();
+
+    // Hover Interactivity
+    c.onmousemove = (e) => {
+        const rect = c.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        
+        let closest = null;
+        let minXDist = Infinity;
+        
+        points.forEach(p => {
+            const xDist = Math.abs(mouseX - p.x);
+            if(xDist < minXDist) {
+                minXDist = xDist;
+                closest = p;
+            }
+        });
+
+        // Redraw base graph (including the new numbers!)
+        drawBase();
+
+        // Draw highlight if hovering over the chart area
+        if(closest && mouseX >= padX && mouseX <= c.width - padX) {
+            ctx.strokeStyle = 'rgba(255, 106, 136, 0.3)'; 
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(closest.x, padY);
+            ctx.lineTo(closest.x, c.height - padY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--secondary') || '#FF6A88';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(closest.x, closest.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-main') || '#5e4b52';
+            ctx.font = 'bold 12px sans-serif';
+            
+            const text = `WPM: ${closest.wpm} (${closest.time}s)`;
+            const textWidth = ctx.measureText(text).width;
+            
+            let textX = closest.x + 10;
+            if (textX + textWidth > c.width) {
+                textX = closest.x - textWidth - 10;
+            }
+            
+            ctx.fillText(text, textX, closest.y - 15);
+        }
+    };
+    
+    // Reset to base graph when mouse leaves
+    c.onmouseleave = () => drawBase();
 }
 
 /* -------- finish -------- */
