@@ -4,180 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saitei's Den | Home</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- HOME PAGE SPECIFIC STYLES --- */
-        
-        /* The New Layout Grid */
-        .scrapbook-layout {
-            display: grid;
-            grid-template-columns: 1fr minmax(auto, 800px) 1fr; /* Left, Center (Main), Right */
-            gap: 2rem;
-            max-width: 75%;
-            margin: 4rem auto 6rem auto;
-            padding: 0 2rem;
-            align-items: start;
+        /* --- CSS VARIABLES (Pastel / Cute Theme) --- */
+        :root {
+            --bg-pattern: #fdfbf7;
+            --paper-bg: #ffffff;
+            --primary: #ff8fab;
+            --secondary: #fb6f92;
+            --tape-color: rgba(255, 200, 221, 0.85);
+            --tape-color-alt: rgba(162, 210, 255, 0.85);
+            --text-dark: #4a4e69;
+            --text-light: #9a8c98;
         }
 
-        /* --- THE SCROLLING SIDE TRACKS --- */
-        .scrapbook-col {
+        /* --- GLOBAL RESETS & TYPOGRAPHY --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-pattern);
+            background-image: radial-gradient(#c9ada7 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Hide default cursor only on devices with a real mouse */
+            @media (pointer: fine) { cursor: none; }
+        }
+
+        h1, h2, h3, .handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            background: var(--paper-bg);
+            padding: 15px 20px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 30px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.05);
+            border: 2px dashed #d5bdaf;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        
+        .navbar::-webkit-scrollbar { display: none; }
+
+        .navbar a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            /* Ensure links can be clicked even with custom cursor */
+            @media (pointer: fine) { cursor: none; } 
+        }
+
+        .navbar a.active, .navbar a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Center navbar items on desktop */
+        @media (min-width: 700px) {
+            .navbar {
+                justify-content: center;
+            }
+        }
+
+        /* --- SCRAPBOOK LAYOUT --- */
+        .scrapbook-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 4rem; 
-            /* Sticky makes sure the photos follow you if the page gets long! */
-            position: sticky;
-            top: 100px; 
+            gap: 3rem;
         }
 
-        .scrapbook-col.right {
-            margin-top: 4rem; /* Staggers the right side */
+        @media (min-width: 900px) {
+            .scrapbook-container {
+                display: grid;
+                grid-template-columns: 1fr 2.5fr 1fr;
+                align-items: start;
+            }
         }
 
-        .scrapbook-image {
-            width: 100%;
-            aspect-ratio: 1; 
-            object-fit: cover;
-            border-radius: 20px;
-            border: 4px dashed var(--primary);
-            padding: 10px;
-            background: var(--card-bg);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-            margin: 0 auto;
+        /* --- POLAROID IMAGES --- */
+        .photo-column {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+        .photo-column::-webkit-scrollbar { display: none; }
+
+        @media (min-width: 900px) {
+            .photo-column {
+                flex-direction: column;
+                overflow-x: visible;
+                padding: 1rem;
+            }
         }
 
-        /* Alternating tilts */
-        .scrapbook-col.left .scrapbook-image:nth-child(odd) { transform: rotate(-4deg); }
-        .scrapbook-col.left .scrapbook-image:nth-child(even) { transform: rotate(3deg); border-color: var(--secondary); }
-        .scrapbook-col.right .scrapbook-image:nth-child(odd) { transform: rotate(4deg); border-color: var(--secondary); }
-        .scrapbook-col.right .scrapbook-image:nth-child(even) { transform: rotate(-3deg); }
-
-        .scrapbook-image:hover {
-            transform: rotate(0deg) scale(1.1) !important;
-            box-shadow: 0 15px 40px rgba(255, 106, 136, 0.2);
-            z-index: 10;
+        .polaroid {
+            flex-shrink: 0;
+            scroll-snap-align: center;
+            background: white;
+            padding: 15px 15px 45px 15px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
             position: relative;
+            width: 250px;
+            transition: transform 0.3s ease;
         }
 
-        /* --- THE CENTER HUB (Main Content) --- */
+        .polaroid img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #eee;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* Washi Tape CSS */
+        .polaroid::before, .paper-scrap::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-3deg);
+            width: 90px;
+            height: 28px;
+            background: var(--tape-color);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .tilt-left { transform: rotate(-4deg); }
+        .tilt-right { transform: rotate(3deg); }
+        .polaroid.tilt-left::before { 
+            background: var(--tape-color-alt); 
+            transform: translateX(-50%) rotate(5deg); 
+        }
+
+        .polaroid:hover {
+            transform: scale(1.05) rotate(0deg);
+            z-index: 10;
+        }
+
+        /* --- CENTER CONTENT (THE SCRAPS) --- */
         .center-feed {
             display: flex;
             flex-direction: column;
-            gap: 5rem; /* Spaces out the sections vertically */
+            gap: 3rem;
         }
 
-        /* The Welcome Header */
-        .home-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .paper-scrap {
+            background: var(--paper-bg);
+            padding: 2.5rem 2rem;
+            position: relative;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.08);
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px; 
+            border: 1px solid #e0e0e0;
+        }
+
+        .paper-scrap.hero {
             text-align: center;
+            background: #fffafa;
         }
 
         .hero-avatar {
-            width: 50%;
-            height: 50%;
-            aspect-ratio: 1;
-            object-fit: cover;
+            width: 227px;
+            height: 227px;
             border-radius: 50%;
-            border: 5px solid white;
-            box-shadow: 0 10px 30px rgba(255, 106, 136, 0.3);
-            margin-bottom: 2rem;
-            animation: float 4s ease-in-out infinite;
+            object-fit: cover;
+            border: 6px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            margin-bottom: 1rem;
         }
 
         .hero-title {
-            font-size: 3.5rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 4rem;
+            color: var(--secondary);
             margin-bottom: 0.5rem;
-        }
-
-        .hero-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            font-weight: bold;
-        }
-
-        /* Skillset Section */
-        .skills-container {
-            width: 100%;
-        }
-
-        .skill-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            display: inline-block;
+            line-height: 1;
         }
 
         .skills-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
-        /* Currently Crafting Banner (Redesigned as a card) */
-        .crafting-banner {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 3.5rem 2rem;
-            color: white;
+        .skill-item { text-align: center; }
+        .skill-item h3 { font-size: 1.8rem; color: var(--primary); }
+
+        /* Sticky Note Style */
+        .sticky-note {
+            background: #fff3b0;
+            padding: 2.5rem 2rem 2rem;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+            transform: rotate(-1.5deg);
             text-align: center;
-            border-radius: var(--radius);
-            box-shadow: 0 15px 40px rgba(255, 106, 136, 0.2);
+            position: relative;
+        }
+        
+        .sticky-note::after {
+            content: '📌';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
         }
 
-        .crafting-banner h2 {
-            color: white;
-            margin-bottom: 1.5rem;
-            font-size: 2.2rem;
-        }
-
-        .crafting-banner p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            font-weight: 500;
-        }
-
+        .sticky-note h2 { font-size: 2.5rem; }
+        
         .crafting-btn {
-            background: white;
-            color: var(--secondary);
-            padding: 12px 30px;
-            border-radius: 30px;
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 10px 25px;
+            background: var(--secondary);
+            color: white;
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-block;
+            border-radius: 50px;
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+            @media (pointer: fine) { cursor: none; }
         }
 
-        .crafting-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        .crafting-btn:hover { transform: scale(1.1); }
+
+        /* --- DESKTOP ONLY: CURSOR, CHASER, & PARTICLES --- */
+        .cursor-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            display: none; /* Hidden by default */
         }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 1024px) {
-            .scrapbook-layout {
-                grid-template-columns: 1fr; /* Stacks everything to 1 column */
-            }
-            .scrapbook-col {
-                flex-direction: row; /* Photos scroll sideways on phones! */
-                overflow-x: auto;
-                gap: 2rem;
-                position: relative;
-                top: 0;
-            }
-            .scrapbook-col.right { margin-top: 0; }
-            .scrapbook-image { min-width: 180px; }
-            .center-feed { order: -1; } /* Pushes the main text above the photos on mobile */
+        .cursor-chaser {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 9998;
+            display: none; /* Hidden by default */
         }
+
+        .cursor-chaser img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .particle {
+            position: fixed;
+            background-color: var(--tape-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9997;
+            animation: fall linear forwards;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Show custom cursor elements ONLY on devices with a mouse */
+        @media (pointer: fine) {
+            .cursor-dot, .cursor-chaser, .particle {
+                display: block;
+            }
+        }
+
     </style>
 </head>
 <body>
+
     <div class="cursor-dot"></div>
-    <div class="cursor-chaser"><img src="" alt="Saitei"></div>
+    <div class="cursor-chaser"><img src="" alt="Chaser"></div>
     <div id="particles"></div>
 
     <nav class="navbar">
@@ -189,59 +323,175 @@
         <a href="wordle.html">(Not) Wordle</a>
     </nav>
 
-    <div class="scrapbook-layout">
+    <div class="scrapbook-container">
         
-        <div class="scrapbook-col left">
-            <img src="https://images.unsplash.com/photo-1516934955-a0bc35ce6754?w=600&q=80" alt="Fox" class="scrapbook-image">
-            <img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=600&q=80" alt="Code" class="scrapbook-image">
-            <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600&q=80" alt="Desk" class="scrapbook-image">
+        <div class="photo-column">
+            <div class="polaroid tilt-left">
+                <img src="https://media.giphy.com/media/hS4AqlRdXLklFH6FjR/giphy.gif" alt="Gif">
+                <div class="handwriting" style="text-align: center; margin-top: 10px; font-size: 1.4rem;">Placeholder</div>
+            </div>
+            <div class="polaroid tilt-right">
+                <img src="https://media.giphy.com/media/hS4AqlRdXLklFH6FjR/giphy.gif" alt="Gif">
+                <div class="handwriting" style="text-align: center; margin-top: 10px; font-size: 1.4rem;">Placeholder</div>
+            </div>
         </div>
 
         <div class="center-feed">
-            
-            <header class="home-header">
+            <section class="paper-scrap hero">
                 <img src="me.gif" alt="Saitei" class="hero-avatar">
                 <h1 class="hero-title">Saitei's Den</h1>
-                <p class="hero-subtitle">In general I just like making websites and setting up domains, so this is just one I can fuck around in and not have to be professional ^^</p>
-            </header>
+                <p>In general I just like making websites and setting up domains, so this is just one I can fuck around with and not have to be professional ^^</p>
+            </section>
 
-            <div class="skills-container">
-                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--secondary);">What I Do</h2>
+            <section class="paper-scrap">
+                <h2 style="text-align: center; font-size: 2.5rem;">What I'm Up To</h2>
                 <div class="skills-grid">
-                    <div class="card" style="text-align: center;">
-                        <span class="skill-icon">💻</span>
-                        <h3>IT Admin</h3>
-                        <p style="font-size: 0.9rem;">Managing networks, hardware inventory, and keeping enterprise servers happy.</p>
+                    <div class="skill-item">
+                        <div style="font-size: 2.5rem;">💻</div>
+                        <h3>Computer Stuff</h3>
+                        <p>I'm a big IT nerd, I love programming (mainly in C#), game design, IT things, etc., and am planning on a big home lab one day</p>
                     </div>
-                    <div class="card" style="text-align: center;">
-                        <span class="skill-icon">🎮</span>
-                        <h3>Game Dev</h3>
-                        <p style="font-size: 0.9rem;">Building VR experiences and addictive tycoon games using Unity 6 and C#.</p>
+                    <div class="skill-item">
+                        <div style="font-size: 2.5rem;">🎮</div>
+                        <h3>Nerd Stuff</h3>
+                        <p>I'm a big game/movie/book nerd, I LOVE weird indie, horror, and basically anything with a story I can fixate on</p>
                     </div>
-                    <div class="card" style="text-align: center;">
-                        <span class="skill-icon">🌐</span>
-                        <h3>Web Apps</h3>
-                        <p style="font-size: 0.9rem;">Designing modern websites and robust ASP.NET RMM dashboards.</p>
+                    <div class="skill-item">
+                        <div style="font-size: 2.5rem;">🌐</div>
+                        <h3>Web Dev</h3>
+                        <p>I'm trying to get better at web development since that helps with cash, hence this website existing lol</p>
+                    </div>
+                    <div class="skill-item">
+                        <div style="font-size: 2.5rem;">🖌️</div>
+                        <h3>Other Hobbies</h3>
+                        <p>I also love hiking, fursuiting, music, drawing, and other random stuff</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="crafting-banner">
-                <h2>Currently Crafting 🛠️</h2>
-                <p>Right now, I'm splitting my time between developing a sleek ASP.NET RMM website for inventory management, and fine-tuning the mechanics of my newest Unity C# project: a Pong-style Idle Tycoon game!</p>
-                <a href="portfolio.html" class="crafting-btn">See My Projects</a>
-            </div>
-
+            <section class="sticky-note">
+                <h2>Currently Tinkering</h2>
+                <p>Most of my projects have no online presence since they were all personal, but I'm trying to document more of what I do now. Right now I have a few Unity C# games, an ASP.Net RMM dashboard, and some other random things in the making.</p>
+                <a href="portfolio.html" class="crafting-btn">See My Projects ➔</a>
+            </section>
         </div>
 
-        <div class="scrapbook-col right">
-            <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600&q=80" alt="Gaming Setup" class="scrapbook-image">
-            <img src="https://images.unsplash.com/photo-1616423640778-28d1b53229bd?w=600&q=80" alt="Cozy Vibes" class="scrapbook-image">
-            <img src="https://images.unsplash.com/photo-1518481612222-68bab828fd1b?w=600&q=80" alt="Retro" class="scrapbook-image">
+        <div class="photo-column">
+            <div class="polaroid tilt-right">
+                <img src="https://media.giphy.com/media/hS4AqlRdXLklFH6FjR/giphy.gif" alt="Gif">
+                <div class="handwriting" style="text-align: center; margin-top: 10px; font-size: 1.4rem;">Placeholder</div>
+            </div>
+            <div class="polaroid tilt-left">
+                <img src="https://media.giphy.com/media/hS4AqlRdXLklFH6FjR/giphy.gif" alt="Gif">
+                <div class="handwriting" style="text-align: center; margin-top: 10px; font-size: 1.4rem;">Placeholder</div>
+            </div>
         </div>
 
     </div>
 
-    <script src="script.js"></script>
+<script>
+// --- CONFIGURATION ---
+const IMG_SITTING = "https://cdn-icons-png.flaticon.com/512/616/616430.png"; 
+const IMG_RUNNING = "https://cdn-icons-png.flaticon.com/512/616/616408.png"; 
+const MAX_SPEED = 8; 
+
+// --- SETUP ---
+const cursorDot = document.querySelector('.cursor-dot');
+const chaser = document.querySelector('.cursor-chaser');
+const chaserImg = chaser.querySelector('img');
+const particleContainer = document.getElementById('particles');
+
+let mouseX = window.innerWidth / 2; 
+let mouseY = window.innerHeight / 2;
+let chaserX = window.innerWidth / 2; 
+let chaserY = window.innerHeight / 2;
+let isRunning = false;
+
+// Check if device has a fine pointer (mouse)
+const isDesktop = () => window.matchMedia("(pointer: fine)").matches;
+
+// 1. Track Mouse (Only attach if desktop)
+if (isDesktop()) {
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursorDot.style.left = mouseX + 'px';
+        cursorDot.style.top = mouseY + 'px';
+    });
+}
+
+// 2. Physics Loop
+function animate() {
+    // Only run the complex math if we are on a desktop
+    if (isDesktop()) {
+        let dx = mouseX - chaserX;
+        let dy = mouseY - chaserY;
+        let distance = Math.sqrt(dx*dx + dy*dy);
+
+        if (distance > 5) {
+            let angle = Math.atan2(dy, dx); 
+            let degrees = angle * (180 / Math.PI); 
+            
+            let vx = dx * 0.1;
+            let vy = dy * 0.1;
+
+            let velocity = Math.sqrt(vx*vx + vy*vy);
+            if (velocity > MAX_SPEED) {
+                let ratio = MAX_SPEED / velocity;
+                vx *= ratio;
+                vy *= ratio;
+            }
+
+            chaserX += vx;
+            chaserY += vy;
+
+            // Adding 90 degrees assuming the placeholder cat image faces up
+            chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(${degrees + 90}deg) translate(-50%, -50%)`;
+
+            if (!isRunning) {
+                chaserImg.src = IMG_RUNNING;
+                isRunning = true;
+            }
+        } else {
+            if (isRunning) {
+                chaserImg.src = IMG_SITTING;
+                isRunning = false;
+                chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(0deg) translate(-50%, -50%)`;
+            }
+        }
+    }
+    requestAnimationFrame(animate);
+}
+
+// Start Loop
+animate();
+
+// --- PARTICLES ---
+if(particleContainer && isDesktop()) {
+    function createParticle() {
+        const p = document.createElement('div');
+        p.classList.add('particle');
+        const size = Math.random() * 10 + 5 + 'px';
+        p.style.width = size;
+        p.style.height = size;
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.top = '-20px'; // Start slightly off screen
+        p.style.animationDuration = Math.random() * 5 + 5 + 's';
+        particleContainer.appendChild(p);
+        setTimeout(() => p.remove(), 10000);
+    }
+    setInterval(createParticle, 600);
+}
+
+// --- ACTIVE LINK HIGHLIGHT ---
+const currentPath = window.location.pathname.split("/").pop();
+const navLinks = document.querySelectorAll('.navbar a');
+navLinks.forEach(link => {
+    // If empty path (like 'localhost:3000/'), highlight index
+    if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
+        link.classList.add('active');
+    }
+});
+</script>
 </body>
 </html>
