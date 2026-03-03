@@ -249,16 +249,13 @@
         .mobile-bridge-input {
             position: absolute;
             opacity: 0;
-            bottom: 40px; /* Moved down closer to where the text actually displays */
-            left: 50%;
             height: 1px;
             width: 1px;
             z-index: -1;
-            pointer-events: none;
             border: none;
             outline: none;
-            padding: 0;
-            margin: 0;
+            background: transparent;
+            color: transparent;
         }
 
         .mobile-hint {
@@ -433,11 +430,23 @@
 
     <script>
         // --- 1. MOBILE KEYBOARD BRIDGE ---
+// --- 1. MOBILE KEYBOARD BRIDGE ---
         const mobileInput = document.getElementById('mobileInput');
         const textDisplay = document.getElementById('textDisplay');
         const mobileHint = document.getElementById('mobileHint');
 
+        // NEW: Function to dynamically move the hidden input under the active word
+        function updateMobileInputPosition() {
+            const currentSpan = textDisplay.querySelector('.current');
+            if (currentSpan) {
+                // Calculate position relative to the main container
+                mobileInput.style.top = (textDisplay.offsetTop + currentSpan.offsetTop + 30) + 'px';
+                mobileInput.style.left = (textDisplay.offsetLeft + currentSpan.offsetLeft) + 'px';
+            }
+        }
+
         textDisplay.addEventListener('click', () => {
+            updateMobileInputPosition(); // Move it to the right spot before focusing
             mobileInput.focus();
             if (mobileHint) mobileHint.style.display = 'none'; 
         });
@@ -455,12 +464,15 @@
             if (val.length === 0) {
                 document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
             } else if (val.length > 1) {
-                // Force lowercase to defeat stubborn mobile auto-capitalization!
-                const char = val.slice(-1).toLowerCase();
+                // FIXED: Removed the forced .toLowerCase() so you can type capitals!
+                const char = val.slice(-1);
                 document.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
             }
             
             mobileInput.value = ' ';
+
+            // NEW: Update the position so the camera follows the text as it wraps
+            setTimeout(updateMobileInputPosition, 10); 
         });
 
         // --- 2. CUSTOM CURSOR & PARTICLES ---
