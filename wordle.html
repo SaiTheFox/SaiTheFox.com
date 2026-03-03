@@ -4,27 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saitei's Den | Wordle</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- WORDLE SPECIFIC THEME --- */
+        /* --- CSS VARIABLES (Pastel / Hybrid Theme) --- */
         :root {
+            --bg-pattern: #fdfbf7;
+            --paper-bg: #ffffff;
+            --primary: #ff8fab;
+            --secondary: #fb6f92;
+            --tape-color: rgba(255, 200, 221, 0.85);
+            --text-dark: #4a4e69;
+            --text-light: #9a8c98;
+            --radius: 20px;
+            
+            /* Wordle Specific Variables */
             --w-green: #8bdc9e;  
             --w-yellow: #f9d56e; 
             --w-gray: #d4c5ce;   
-            --w-tile: var(--card-bg);
+            --w-tile: #ffffff;
             --w-border: var(--primary);
+            --w-key-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        /* --- GLOBAL RESETS & TYPOGRAPHY --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-pattern);
+            background-image: radial-gradient(#c9ada7 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            @media (pointer: fine) { cursor: none; }
+        }
+
+        h1, h2, h3, .handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            display: flex;
+            gap: 1rem;
+            background: var(--paper-bg);
+            padding: 15px 20px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 30px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.05);
+            border: 2px dashed #d5bdaf;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            position: relative;
+            z-index: 20; 
+        }
+        
+        .navbar::-webkit-scrollbar { display: none; }
+
+        .navbar a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            @media (pointer: fine) { cursor: none; } 
+        }
+
+        .navbar a.active, .navbar a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (min-width: 700px) {
+            .navbar { justify-content: center; }
+        }
+
+        /* --- DESKTOP ONLY: CURSOR & PARTICLES --- */
+        .cursor-dot {
+            width: 12px; height: 12px; background-color: var(--secondary);
+            border-radius: 50%; position: fixed; pointer-events: none;
+            z-index: 99999 !important; transform: translate(-50%, -50%); display: none; 
+        }
+
+        .cursor-chaser {
+            position: fixed; width: 40px; height: 40px; pointer-events: none;
+            z-index: 99998 !important; display: none; 
+        }
+
+        .cursor-chaser img { width: 100%; height: 100%; object-fit: contain; }
+
+        .particle {
+            position: fixed; background-color: var(--tape-color); border-radius: 50%;
+            pointer-events: none; z-index: 1; 
+            animation: fall linear forwards; display: none; 
+        }
+
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        @media (pointer: fine) { .cursor-dot, .cursor-chaser, .particle { display: block; } }
+
+        /* --- WORDLE SPECIFIC STYLES --- */
+        .page-content {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
         }
 
         .wordle-container {
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 2rem;
+            max-width: 650px; /* Widened from 500px */
+            background: rgba(255,255,255,0.75); 
+            backdrop-filter: blur(12px);
+            padding: 2.5rem 3rem;
             border-radius: var(--radius);
-            box-shadow: 0 10px 30px rgba(255, 106, 136, 0.1);
+            box-shadow: 0 15px 35px rgba(251, 111, 146, 0.15);
+            border: 1px solid rgba(255,255,255,0.5);
             position: relative;
-            z-index: 10;
+            z-index: 10; 
         }
 
         .w-header {
@@ -32,12 +141,12 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--bg-color);
+            border-bottom: 2px dashed #d5bdaf;
             padding-bottom: 1rem;
         }
 
         .w-title h1 {
-            font-size: 1.8rem;
+            font-size: 2.8rem;
             color: var(--secondary);
             margin: 0;
             line-height: 1;
@@ -46,52 +155,56 @@
         .w-stats {
             display: flex;
             gap: 15px;
-            font-size: 0.85rem;
-            color: var(--text-light);
+            font-size: 1.1rem;
+            color: var(--text-dark);
             font-weight: bold;
         }
 
         .w-controls {
             display: flex;
             gap: 10px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             justify-content: center;
         }
 
         .w-controls select, .w-controls button {
-            background: var(--bg-color);
-            border: none;
-            color: var(--secondary);
-            padding: 8px 15px;
-            border-radius: 15px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--text-dark);
+            padding: 10px 18px;
+            border-radius: 12px;
             font-weight: bold;
-            font-family: inherit;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            font-size: 1rem;
+            font-family: 'Nunito', sans-serif;
+            transition: transform 0.2s, background 0.2s, color 0.2s;
+            @media (pointer: fine) { cursor: none; }
         }
 
         .w-controls button.primary {
             background: var(--secondary);
             color: white;
+            border-color: var(--secondary);
         }
 
         .w-controls button:hover, .w-controls select:hover {
             transform: translateY(-2px);
+            background: var(--primary);
+            color: white;
         }
 
         /* --- BOARD --- */
         .board {
             display: grid;
             grid-template-rows: repeat(6, 1fr);
-            gap: 8px;
-            max-width: 320px;
-            margin: 0 auto 20px;
+            gap: 10px; /* Increased from 8px */
+            max-width: 380px; /* Scaled up from 320px */
+            margin: 0 auto 30px;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            gap: 10px; /* Increased from 8px */
         }
 
         .tile {
@@ -101,51 +214,76 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 1.8rem;
+            font-size: 2rem;
             background: var(--w-tile);
             border: 2px solid var(--w-border);
             border-radius: 12px;
-            color: var(--text-main);
+            color: var(--text-dark);
             text-transform: uppercase;
             user-select: none;
-            transition: transform 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+            /* Preserve 3D space for smooth flipping */
+            transform-style: preserve-3d;
         }
 
+        /* Input Bump Animation */
         .tile.filled { animation: pop .1s ease; }
-        @keyframes pop { from {transform: scale(.9)} to {transform: scale(1)} }
-        .tile.flip { transform: rotateX(90deg); }
+        @keyframes pop { 
+            0% {transform: scale(.9)} 
+            100% {transform: scale(1)} 
+        }
+
+        /* Cascading Flip Animations */
+        .flip-in { animation: flipIn 0.25s ease-in forwards; }
+        .flip-out { animation: flipOut 0.25s ease-out forwards; }
+        
+        @keyframes flipIn { 
+            to { transform: rotateX(90deg); } 
+        }
+        @keyframes flipOut { 
+            from { transform: rotateX(-90deg); } 
+            to { transform: rotateX(0deg); } 
+        }
 
         /* --- KEYBOARD --- */
         .keyboard {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px; /* Increased */
             align-items: center;
         }
 
         .keyrow {
             display: flex;
-            gap: 6px;
+            gap: 8px; /* Increased */
         }
 
         .key {
-            min-width: 35px;
-            padding: 12px 10px;
-            border-radius: 10px;
-            border: none;
-            background: var(--bg-color);
-            color: var(--text-main);
-            font-weight: bold;
+            min-width: 42px; /* Increased */
+            padding: 16px 12px; /* Increased */
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: var(--w-key-bg);
+            color: var(--text-dark);
+            font-weight: 800;
+            font-size: 1.1rem; /* Increased */
             font-family: inherit;
-            cursor: pointer;
-            transition: background 0.2s;
+            transition: transform 0.2s, border-color 0.2s; /* Removed background from CSS transition to allow flip animation */
             user-select: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transform-style: preserve-3d;
+            @media (pointer: fine) { cursor: none; }
         }
 
-        .key.wide { min-width: 60px; font-size: 0.9rem; }
-        .key.color-gray { background: var(--w-gray); color: white; }
-        .key.color-yellow { background: var(--w-yellow); color: white; }
-        .key.color-green { background: var(--w-green); color: white; }
+        .key:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .key.wide { min-width: 70px; font-size: 0.95rem; }
+        .key.color-gray { background: var(--w-gray); color: white; border-color: var(--w-gray); }
+        .key.color-yellow { background: var(--w-yellow); color: white; border-color: var(--w-yellow); }
+        .key.color-green { background: var(--w-green); color: white; border-color: var(--w-green); }
 
         .message {
             text-align: center;
@@ -153,12 +291,13 @@
             color: var(--secondary);
             font-weight: bold;
             margin-bottom: 10px;
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
     <div class="cursor-dot"></div>
-    <div class="cursor-chaser"><img src="" alt="Saitei"></div>
+    <div class="cursor-chaser"><img src="" alt="Chaser"></div>
     <div id="particles"></div>
 
     <nav class="navbar">
@@ -197,7 +336,71 @@
         </div>
     </section>
 
-    <script src="script.js"></script>
+    <script>
+        const IMG_SITTING = "https://cdn-icons-png.flaticon.com/512/616/616430.png"; 
+        const IMG_RUNNING = "https://cdn-icons-png.flaticon.com/512/616/616408.png"; 
+        const MAX_SPEED = 8; 
+
+        const cursorDot = document.querySelector('.cursor-dot');
+        const chaser = document.querySelector('.cursor-chaser');
+        const chaserImg = chaser.querySelector('img');
+        const particleContainer = document.getElementById('particles');
+
+        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
+        let chaserX = window.innerWidth / 2; let chaserY = window.innerHeight / 2;
+        let isRunning = false;
+
+        const isDesktop = () => window.matchMedia("(pointer: fine)").matches;
+
+        if (isDesktop()) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX; mouseY = e.clientY;
+                cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px';
+            });
+        }
+
+        function animate() {
+            if (isDesktop()) {
+                let dx = mouseX - chaserX; let dy = mouseY - chaserY;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+
+                if (distance > 5) {
+                    let angle = Math.atan2(dy, dx); let degrees = angle * (180 / Math.PI); 
+                    let vx = dx * 0.1; let vy = dy * 0.1;
+
+                    let velocity = Math.sqrt(vx*vx + vy*vy);
+                    if (velocity > MAX_SPEED) {
+                        let ratio = MAX_SPEED / velocity;
+                        vx *= ratio; vy *= ratio;
+                    }
+
+                    chaserX += vx; chaserY += vy;
+                    chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(${degrees + 90}deg) translate(-50%, -50%)`;
+
+                    if (!isRunning) { chaserImg.src = IMG_RUNNING; isRunning = true; }
+                } else {
+                    if (isRunning) {
+                        chaserImg.src = IMG_SITTING; isRunning = false;
+                        chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(0deg) translate(-50%, -50%)`;
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        if(particleContainer && isDesktop()) {
+            function createParticle() {
+                const p = document.createElement('div'); p.classList.add('particle');
+                const size = Math.random() * 10 + 5 + 'px';
+                p.style.width = size; p.style.height = size;
+                p.style.left = Math.random() * 100 + 'vw'; p.style.top = '-20px'; 
+                p.style.animationDuration = Math.random() * 5 + 5 + 's';
+                particleContainer.appendChild(p); setTimeout(() => p.remove(), 10000);
+            }
+            setInterval(createParticle, 600);
+        }
+    </script>
 
     <script>
         const WORD_LENGTH = 5;
@@ -211,6 +414,7 @@
         let currentRow = 0;
         let currentCol = 0;
         let isGameOver = false;
+        let isAnimating = false; // Block typing during cascades
         let stats = loadStats();
 
         let WORDS = [];
@@ -258,10 +462,13 @@
             });
             newRandomBtn.addEventListener('click', ()=> startGame('random', true));
             window.addEventListener('keydown', onKeydown);
+            buildBoardHTML(); 
+            renderKeyboard();
         }
 
         function startGame(requestedMode, forceNewRandom){
             isGameOver = false;
+            isAnimating = false;
             currentRow = 0;
             currentCol = 0;
             grid = Array.from({length:MAX_ROWS},()=>Array(WORD_LENGTH).fill(''));
@@ -276,8 +483,10 @@
                 solution = pickRandom();
                 solutionId = 'random_' + Date.now().toString(36);
             }
-            renderBoard();
-            renderKeyboard();
+            
+            // Wipe board and keyboard clean visually
+            clearBoardVisuals();
+            resetKeyboardColors();
         }
 
         function pickDaily(){
@@ -295,30 +504,53 @@
             return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
         }
 
-        function renderBoard(){
+        // --- NEW: Board Building & Updating ---
+        function buildBoardHTML() {
             boardEl.innerHTML = '';
-            for(let r=0;r<MAX_ROWS;r++){
+            for(let r=0; r<MAX_ROWS; r++){
                 const row = document.createElement('div');
                 row.className='row';
-                for(let c=0;c<WORD_LENGTH;c++){
+                for(let c=0; c<WORD_LENGTH; c++){
                     const tile = document.createElement('div');
                     tile.className='tile';
-                    const ch = grid[r][c] || '';
-                    tile.textContent = ch;
-                    
-                    if(r < currentRow){
-                        const guess = grid[r].join('');
-                        const colors = scoreGuess(guess, solution);
-                        tile.style.background = colors[c] === 'green' ? 'var(--w-green)' : colors[c] === 'yellow' ? 'var(--w-yellow)' : 'var(--w-gray)';
-                        tile.style.borderColor = tile.style.background;
-                        tile.style.color = 'white';
-                    }
                     row.appendChild(tile);
                 }
                 boardEl.appendChild(row);
             }
         }
 
+        function clearBoardVisuals() {
+            for(let r=0; r<MAX_ROWS; r++){
+                const rowEl = boardEl.children[r];
+                for(let c=0; c<WORD_LENGTH; c++){
+                    const tile = rowEl.children[c];
+                    tile.textContent = '';
+                    tile.style.background = '';
+                    tile.style.borderColor = '';
+                    tile.style.color = '';
+                    tile.className = 'tile'; // Strip animation classes
+                }
+            }
+        }
+
+        function updateBoardText() {
+            const rowEl = boardEl.children[currentRow];
+            for(let c=0; c<WORD_LENGTH; c++){
+                const tile = rowEl.children[c];
+                const ch = grid[currentRow][c] || '';
+                
+                // Add pop animation if a letter was just typed
+                if(tile.textContent !== ch) {
+                    tile.textContent = ch;
+                    if(ch !== '') {
+                        tile.classList.add('filled');
+                        setTimeout(() => tile.classList.remove('filled'), 150);
+                    }
+                }
+            }
+        }
+
+        // --- NEW: Keyboard Building & Animating ---
         function renderKeyboard(){
             const layout = ["qwertyuiop","asdfghjkl","zxcvbnm"];
             keyboardEl.innerHTML = '';
@@ -342,7 +574,6 @@
                 }
                 keyboardEl.appendChild(row);
             });
-            refreshKeyboardColors();
         }
 
         function makeKey(label, extraClass=''){
@@ -353,47 +584,63 @@
             return k;
         }
 
-        function refreshKeyboardColors(){
-            const keyColors = {}; 
-            for(let r=0;r<currentRow;r++){
-                const guess = grid[r].join('');
-                const colors = scoreGuess(guess, solution);
-                for(let i=0;i<guess.length;i++){
-                    const ch = guess[i];
-                    const col = colors[i];
-                    if(keyColors[ch]==='green') continue;
-                    if(col==='green') keyColors[ch]='green';
-                    else if(col==='yellow') keyColors[ch] = keyColors[ch]==='green' ? 'green' : 'yellow';
-                    else if(!keyColors[ch]) keyColors[ch]='gray';
-                }
-            }
-            document.querySelectorAll('.key').forEach(k=>{
-                k.classList.remove('color-green','color-yellow','color-gray');
-                const ch = k.dataset.key;
-                if(keyColors[ch]) k.classList.add('color-'+keyColors[ch]);
+        function resetKeyboardColors() {
+            document.querySelectorAll('.key').forEach(k => {
+                k.classList.remove('color-green', 'color-yellow', 'color-gray', 'flip-in', 'flip-out');
             });
         }
 
+        // Only animates keys that upgrade to a better color
+        function animateKeyboardColors(guess, colors) {
+            for(let i=0; i<guess.length; i++) {
+                const ch = guess[i];
+                const col = colors[i];
+                const k = document.querySelector(`.key[data-key="${ch}"]`);
+                if(!k) continue;
+
+                const currentClass = k.classList.contains('color-green') ? 'green' : 
+                                     k.classList.contains('color-yellow') ? 'yellow' : 
+                                     k.classList.contains('color-gray') ? 'gray' : null;
+                
+                let newClass = col;
+                if(currentClass === 'green') newClass = 'green';
+                else if(currentClass === 'yellow' && col !== 'green') newClass = 'yellow';
+                
+                if(currentClass !== newClass) {
+                    setTimeout(() => {
+                        k.classList.add('flip-in');
+                        setTimeout(() => {
+                            k.classList.remove('flip-in', 'color-gray', 'color-yellow', 'color-green');
+                            k.classList.add('color-' + newClass);
+                            k.classList.add('flip-out');
+                            setTimeout(() => k.classList.remove('flip-out'), 250);
+                        }, 250);
+                    }, i * 150); // Stagger the key flips slightly
+                }
+            }
+        }
+
+        // --- Interaction Logic ---
         function onKey(ch){
-            if(isGameOver) return;
+            if(isGameOver || isAnimating) return;
             if(currentCol < WORD_LENGTH){
                 grid[currentRow][currentCol] = ch;
                 currentCol++;
-                renderBoard();
+                updateBoardText();
             }
         }
 
         function onBackspace(){
-            if(isGameOver) return;
-            if(currentCol>0){
+            if(isGameOver || isAnimating) return;
+            if(currentCol > 0){
                 currentCol--;
                 grid[currentRow][currentCol] = '';
-                renderBoard();
+                updateBoardText();
             }
         }
 
         function onEnter(){
-            if(isGameOver) return;
+            if(isGameOver || isAnimating) return;
             const guess = grid[currentRow].join('');
             if(guess.length !== WORD_LENGTH){
                 message('Not enough letters!');
@@ -404,11 +651,43 @@
                 return;
             }
             
-            currentRow++;
-            currentCol = 0;
-            refreshKeyboardColors();
-            renderBoard();
+            isAnimating = true; // Lock controls
+            const colors = scoreGuess(guess, solution);
+            const rowEl = boardEl.children[currentRow];
 
+            // Cascade Flip Animation for the Board
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                setTimeout(() => {
+                    const tile = rowEl.children[i];
+                    tile.classList.add('flip-in');
+                    
+                    setTimeout(() => {
+                        tile.classList.remove('flip-in');
+                        
+                        // Change color mid-flip
+                        tile.style.background = colors[i] === 'green' ? 'var(--w-green)' : colors[i] === 'yellow' ? 'var(--w-yellow)' : 'var(--w-gray)';
+                        tile.style.borderColor = tile.style.background;
+                        tile.style.color = 'white';
+                        
+                        tile.classList.add('flip-out');
+                        setTimeout(() => tile.classList.remove('flip-out'), 250);
+
+                        // If this is the last tile, unlock and move to next row
+                        if (i === WORD_LENGTH - 1) {
+                            setTimeout(() => {
+                                isAnimating = false;
+                                animateKeyboardColors(guess, colors);
+                                currentRow++;
+                                currentCol = 0;
+                                checkWinCondition(guess);
+                            }, 250);
+                        }
+                    }, 250); // Halfway point
+                }, i * 250); // Stagger tiles by 250ms
+            }
+        }
+
+        function checkWinCondition(guess) {
             if(guess === solution){
                 isGameOver = true;
                 message('You win! 🎉');
@@ -441,7 +720,10 @@
         }
 
         function onKeydown(e){
-            if(isGameOver) return;
+            // Ensure we aren't blocking shortcuts like Ctrl+R or F5
+            if(e.ctrlKey || e.metaKey || e.altKey) return;
+            
+            if(isGameOver || isAnimating) return;
             if(e.key === 'Backspace') { onBackspace(); return; }
             if(e.key === 'Enter') { onEnter(); return; }
             const k = e.key.toLowerCase();
