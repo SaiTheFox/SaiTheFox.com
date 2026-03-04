@@ -35,7 +35,6 @@
             color: var(--text-dark);
             line-height: 1.6;
             overflow-x: hidden;
-            /* Hide default cursor only on devices with a real mouse */
             @media (pointer: fine) { cursor: none; }
         }
 
@@ -69,7 +68,6 @@
             padding: 5px 15px;
             border-radius: 20px;
             transition: all 0.2s;
-            /* Ensure links can be clicked even with custom cursor */
             @media (pointer: fine) { cursor: none; } 
         }
 
@@ -79,11 +77,8 @@
             transform: translateY(-2px);
         }
 
-        /* Center navbar items on desktop */
         @media (min-width: 700px) {
-            .navbar {
-                justify-content: center;
-            }
+            .navbar { justify-content: center; }
         }
 
         /* --- SCRAPBOOK LAYOUT --- */
@@ -142,7 +137,6 @@
             border: 1px solid #f0f0f0;
         }
 
-        /* Washi Tape CSS */
         .polaroid::before, .paper-scrap::before {
             content: '';
             position: absolute;
@@ -197,6 +191,8 @@
             border: 6px solid white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
             margin-bottom: 1rem;
+            transition: transform 0.1s ease; /* Snappy bump for clicking */
+            @media (pointer: fine) { cursor: none; }
         }
 
         .hero-title {
@@ -205,6 +201,49 @@
             margin-bottom: 0.5rem;
             line-height: 1;
         }
+
+        /* --- EASTER EGG CSS --- */
+        .upgrades-container {
+            display: none; /* Hidden until clicked */
+            margin-top: 1.5rem;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .upgrade-btn {
+            background: white;
+            border: 2px solid var(--secondary);
+            color: var(--text-dark);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            opacity: 0.4; /* Faded until affordable */
+            pointer-events: none; /* Unclickable until affordable */
+            @media (pointer: fine) { cursor: none; }
+        }
+
+        .upgrade-btn.affordable {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .upgrade-btn:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .upgrade-btn span {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: block;
+            margin-top: 3px;
+        }
+        .upgrade-btn:hover span { color: rgba(255,255,255,0.9); }
 
         .skills-grid {
             display: grid;
@@ -215,6 +254,44 @@
 
         .skill-item { text-align: center; }
         .skill-item h3 { font-size: 1.8rem; color: var(--primary); }
+
+        .hero-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .floating-text {
+            position: absolute;
+            color: var(--primary);
+            font-family: 'Caveat', cursive;
+            font-size: 2.5rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 50;
+            animation: floatUp 0.8s ease-out forwards;
+            /* A thick white outline ensures it's readable over the gif */
+            text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; 
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, calc(-50% - 60px)) scale(1.5); }
+        }
+
+        .fox-helper {
+            position: absolute;
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: 5;
+            animation: bob 2s infinite alternate ease-in-out;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.15));
+        }
+
+        @keyframes bob {
+            from { transform: translateY(0px) rotate(-10deg); }
+            to { transform: translateY(-15px) rotate(10deg); }
+        }
 
         /* Sticky Note Style */
         .sticky-note {
@@ -256,55 +333,24 @@
 
         /* --- DESKTOP ONLY: CURSOR, CHASER, & PARTICLES --- */
         .cursor-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--secondary);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            display: none; /* Hidden by default */
+            width: 12px; height: 12px; background-color: var(--secondary); border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); display: none; 
         }
 
         .cursor-chaser {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            pointer-events: none;
-            z-index: 9998;
-            display: none; /* Hidden by default */
+            position: fixed; width: 40px; height: 40px; pointer-events: none;
+            z-index: 9998; display: none; 
         }
 
-        .cursor-chaser img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .cursor-chaser img { width: 100%; height: 100%; object-fit: contain; }
 
         .particle {
-            position: fixed;
-            background-color: var(--tape-color);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9997;
-            animation: fall linear forwards;
-            display: none; /* Hidden by default */
+            position: fixed; background-color: var(--tape-color); border-radius: 50%;
+            pointer-events: none; z-index: 9997; animation: fall linear forwards; display: none; 
         }
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Show custom cursor elements ONLY on devices with a mouse */
-        @media (pointer: fine) {
-            .cursor-dot, .cursor-chaser, .particle {
-                display: block;
-            }
-        }
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+        @media (pointer: fine) { .cursor-dot, .cursor-chaser, .particle { display: block; } }
 
     </style>
 </head>
@@ -338,9 +384,22 @@
 
         <div class="center-feed">
             <section class="paper-scrap hero">
-                <img src="me.gif" alt="Saitei" class="hero-avatar">
-                <h1 class="hero-title">Saitei's Den</h1>
-                <p>In general I just like making websites and setting up domains, so this is just one I can fuck around with and not have to be professional ^^</p>
+
+                <h2 id="click-counter" style="display: none; font-size: 3.5rem; color: var(--secondary); margin-bottom: 0.5rem; font-family: 'Caveat', cursive;">0 Clicks</h2>
+                
+                <div id="hero-wrapper" class="hero-wrapper">
+                    <img src="me.gif" alt="Saitei" class="hero-avatar" id="hero-img">
+                </div>
+                
+                <div id="hero-text">
+                    <h1 class="hero-title">Saitei's Den</h1>
+                    <p>In general I just like making websites and setting up domains, so this is just one I can mess around with and not have to be professional ^^</p>
+                </div>
+
+                <div id="clicker-upgrades" class="upgrades-container">
+                    <button class="upgrade-btn" id="btn-cursor">👆 Better Click (+1)<br><span>Cost: 10</span></button>
+                    <button class="upgrade-btn" id="btn-auto">🦊 Fox Helper (+1/s)<br><span>Cost: 50</span></button>
+                </div>
             </section>
 
             <section class="paper-scrap">
@@ -390,106 +449,180 @@
     </div>
 
 <script>
-// --- CONFIGURATION ---
+// --- CONFIGURATION & CURSOR SETUP ---
 const IMG_SITTING = "https://cdn-icons-png.flaticon.com/512/616/616430.png"; 
 const IMG_RUNNING = "https://cdn-icons-png.flaticon.com/512/616/616408.png"; 
 const MAX_SPEED = 8; 
 
-// --- SETUP ---
 const cursorDot = document.querySelector('.cursor-dot');
 const chaser = document.querySelector('.cursor-chaser');
 const chaserImg = chaser.querySelector('img');
 const particleContainer = document.getElementById('particles');
 
-let mouseX = window.innerWidth / 2; 
-let mouseY = window.innerHeight / 2;
-let chaserX = window.innerWidth / 2; 
-let chaserY = window.innerHeight / 2;
+let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
+let chaserX = window.innerWidth / 2; let chaserY = window.innerHeight / 2;
 let isRunning = false;
 
-// Check if device has a fine pointer (mouse)
 const isDesktop = () => window.matchMedia("(pointer: fine)").matches;
 
-// 1. Track Mouse (Only attach if desktop)
 if (isDesktop()) {
     document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        cursorDot.style.left = mouseX + 'px';
-        cursorDot.style.top = mouseY + 'px';
+        mouseX = e.clientX; mouseY = e.clientY;
+        cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px';
     });
 }
 
-// 2. Physics Loop
 function animate() {
-    // Only run the complex math if we are on a desktop
     if (isDesktop()) {
-        let dx = mouseX - chaserX;
-        let dy = mouseY - chaserY;
+        let dx = mouseX - chaserX; let dy = mouseY - chaserY;
         let distance = Math.sqrt(dx*dx + dy*dy);
 
         if (distance > 5) {
-            let angle = Math.atan2(dy, dx); 
-            let degrees = angle * (180 / Math.PI); 
-            
-            let vx = dx * 0.1;
-            let vy = dy * 0.1;
+            let angle = Math.atan2(dy, dx); let degrees = angle * (180 / Math.PI); 
+            let vx = dx * 0.1; let vy = dy * 0.1;
 
             let velocity = Math.sqrt(vx*vx + vy*vy);
             if (velocity > MAX_SPEED) {
                 let ratio = MAX_SPEED / velocity;
-                vx *= ratio;
-                vy *= ratio;
+                vx *= ratio; vy *= ratio;
             }
 
-            chaserX += vx;
-            chaserY += vy;
-
-            // Adding 90 degrees assuming the placeholder cat image faces up
+            chaserX += vx; chaserY += vy;
             chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(${degrees + 90}deg) translate(-50%, -50%)`;
 
-            if (!isRunning) {
-                chaserImg.src = IMG_RUNNING;
-                isRunning = true;
-            }
+            if (!isRunning) { chaserImg.src = IMG_RUNNING; isRunning = true; }
         } else {
             if (isRunning) {
-                chaserImg.src = IMG_SITTING;
-                isRunning = false;
+                chaserImg.src = IMG_SITTING; isRunning = false;
                 chaser.style.transform = `translate(${chaserX}px, ${chaserY}px) rotate(0deg) translate(-50%, -50%)`;
             }
         }
     }
     requestAnimationFrame(animate);
 }
-
-// Start Loop
 animate();
 
-// --- PARTICLES ---
 if(particleContainer && isDesktop()) {
     function createParticle() {
-        const p = document.createElement('div');
-        p.classList.add('particle');
+        const p = document.createElement('div'); p.classList.add('particle');
         const size = Math.random() * 10 + 5 + 'px';
-        p.style.width = size;
-        p.style.height = size;
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.top = '-20px'; // Start slightly off screen
+        p.style.width = size; p.style.height = size;
+        p.style.left = Math.random() * 100 + 'vw'; p.style.top = '-20px'; 
         p.style.animationDuration = Math.random() * 5 + 5 + 's';
-        particleContainer.appendChild(p);
-        setTimeout(() => p.remove(), 10000);
+        particleContainer.appendChild(p); setTimeout(() => p.remove(), 10000);
     }
     setInterval(createParticle, 600);
 }
 
-// --- ACTIVE LINK HIGHLIGHT ---
 const currentPath = window.location.pathname.split("/").pop();
 const navLinks = document.querySelectorAll('.navbar a');
 navLinks.forEach(link => {
-    // If empty path (like 'localhost:3000/'), highlight index
     if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === 'index.html')) {
         link.classList.add('active');
+    }
+});
+
+// --- EASTER EGG CLICKER GAME LOGIC ---
+// --- EASTER EGG CLICKER GAME LOGIC ---
+let clicks = 0;
+let clickPower = 1;
+let autoClicks = 0;
+let cursorCost = 10;
+let autoCost = 50;
+let gameActive = false;
+
+const heroImg = document.getElementById('hero-img');
+const heroWrapper = document.getElementById('hero-wrapper');
+const heroText = document.getElementById('hero-text');
+const clickCounter = document.getElementById('click-counter');
+const upgradesDiv = document.getElementById('clicker-upgrades');
+const btnCursor = document.getElementById('btn-cursor');
+const btnAuto = document.getElementById('btn-auto');
+
+function updateGameUI() {
+    clickCounter.textContent = clicks + (clicks === 1 ? ' Click' : ' Clicks');
+    
+    btnCursor.innerHTML = `👆 Better Click (+${clickPower + 1}) <br><span>Cost: ${cursorCost}</span>`;
+    btnAuto.innerHTML = `🦊 Fox Helper (+${autoClicks + 1}/s) <br><span>Cost: ${autoCost}</span>`;
+    
+    if (clicks >= cursorCost) btnCursor.classList.add('affordable');
+    else btnCursor.classList.remove('affordable');
+
+    if (clicks >= autoCost) btnAuto.classList.add('affordable');
+    else btnAuto.classList.remove('affordable');
+}
+
+heroImg.addEventListener('click', (e) => {
+    if (!gameActive) {
+        gameActive = true;
+        heroText.style.display = 'none';
+        clickCounter.style.display = 'block';
+        upgradesDiv.style.display = 'flex';
+    }
+    
+    clicks += clickPower;
+    
+    // The image squish
+    heroImg.style.transform = 'scale(0.9)';
+    setTimeout(() => heroImg.style.transform = 'scale(1)', 100);
+    
+    // Spawning the floating "+1" text
+    const floatText = document.createElement('div');
+    floatText.classList.add('floating-text');
+    floatText.textContent = '+' + clickPower;
+    
+    // Randomize the spawn position slightly so they don't completely overlap
+    const offsetX = (Math.random() - 0.5) * 100;
+    const offsetY = (Math.random() - 0.5) * 100;
+    floatText.style.left = `calc(50% + ${offsetX}px)`;
+    floatText.style.top = `calc(50% + ${offsetY}px)`;
+    
+    heroWrapper.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 800); // Clean up the DOM after animation
+
+    updateGameUI();
+});
+
+btnCursor.addEventListener('click', () => {
+    if (clicks >= cursorCost) {
+        clicks -= cursorCost;
+        clickPower++;
+        cursorCost = Math.floor(cursorCost * 1.25); 
+        updateGameUI();
+    }
+});
+
+btnAuto.addEventListener('click', () => {
+    if (clicks >= autoCost) {
+        clicks -= autoCost;
+        autoClicks++;
+        autoCost = Math.floor(autoCost * 1.25); 
+        
+        // NEW: Spawn a physical Fox Helper element
+        const helper = document.createElement('div');
+        helper.classList.add('fox-helper');
+        helper.textContent = '🦊';
+        
+        // Calculate a random spot in a ring around the avatar (Radius ~130px)
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 130 + Math.random() * 20; 
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        
+        helper.style.left = `calc(50% + ${x}px - 20px)`; 
+        helper.style.top = `calc(50% + ${y}px - 20px)`;
+        helper.style.animationDelay = `${Math.random() * 2}s`; // Desync their bobbing
+        
+        heroWrapper.appendChild(helper);
+
+        // Start the idle loop on the very first purchase
+        if (autoClicks === 1) {
+            setInterval(() => {
+                clicks += autoClicks;
+                updateGameUI();
+            }, 1000);
+        }
+        updateGameUI();
     }
 });
 </script>
