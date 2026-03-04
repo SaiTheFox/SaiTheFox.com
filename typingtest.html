@@ -249,8 +249,8 @@
         .mobile-bridge-input {
             position: absolute;
             opacity: 0;
-            height: 1px;
-            width: 1px;
+            height: 2rem; /* Give it physical height so the browser respects its bounds */
+            width: 2rem;
             z-index: -1;
             border: none;
             outline: none;
@@ -268,6 +268,15 @@
             animation: pulse 1.5s infinite;
         }
 
+        /* --- MOBILE MEDIA QUERY --- */
+        @media (max-width: 600px) {
+            .mobile-hint { display: block; }
+            .typing-display {
+                font-size: 1.2rem; /* Shrink the huge text on mobile */
+                padding: 1rem;
+            }
+        }
+        /* Touch devices specifically */
         @media (pointer: coarse) {
             .mobile-hint { display: block; }
         }
@@ -434,25 +443,41 @@
         const textDisplay = document.getElementById('textDisplay');
         const mobileHint = document.getElementById('mobileHint');
 
-        // NEW: Function to dynamically move the hidden input under the active word
+        let lastSpanTop = -1;
+
         function updateMobileInputPosition() {
             const currentSpan = textDisplay.querySelector('.current');
             if (currentSpan) {
-                // Calculate position relative to the main container
-                mobileInput.style.top = (textDisplay.offsetTop + currentSpan.offsetTop - 120) + 'px';
+                // Keep the input positioned directly over the current letter
+                mobileInput.style.top = (textDisplay.offsetTop + currentSpan.offsetTop) + 'px';
                 mobileInput.style.left = (textDisplay.offsetLeft + currentSpan.offsetLeft) + 'px';
+                
+                // If the text wraps to a new line, force the screen to center on it
+                if (currentSpan.offsetTop !== lastSpanTop) {
+                    lastSpanTop = currentSpan.offsetTop;
+                    // Only auto-scroll on touch devices so it doesn't mess up desktop scrolling
+                    if (window.matchMedia("(pointer: coarse)").matches) {
+                        currentSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
             }
         }
 
         textDisplay.addEventListener('click', () => {
-            updateMobileInputPosition(); // Move it to the right spot before focusing
+            updateMobileInputPosition(); 
             mobileInput.focus();
             if (mobileHint) mobileHint.style.display = 'none'; 
+            
+            // Wait 300ms for the mobile keyboard to physically slide up, then center the view
+            setTimeout(() => {
+                const currentSpan = textDisplay.querySelector('.current');
+                if (currentSpan) currentSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
         });
 
         mobileInput.value = ' ';
 
-        // Stop the native mobile keydown from reaching typingtest.js (fixes double-typing)
+        // Stop the native mobile keydown from reaching typingtest.js
         mobileInput.addEventListener('keydown', (e) => {
             e.stopPropagation(); 
         });
@@ -463,14 +488,13 @@
             if (val.length === 0) {
                 document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace' }));
             } else if (val.length > 1) {
-                // FIXED: Removed the forced .toLowerCase() so you can type capitals!
                 const char = val.slice(-1);
                 document.dispatchEvent(new KeyboardEvent('keydown', { key: char }));
             }
             
             mobileInput.value = ' ';
 
-            // NEW: Update the position so the camera follows the text as it wraps
+            // Update position after every keystroke
             setTimeout(updateMobileInputPosition, 10); 
         });
 
@@ -543,6 +567,3 @@
     <script src="typingtest.js"></script>
 </body>
 </html>
-
-
-
