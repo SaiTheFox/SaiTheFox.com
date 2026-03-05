@@ -157,6 +157,15 @@ const interestsData = [
         review: "This almost feels like an art piece to watch, and does such a good job at just implanting emotions in you.",
         rating: 5
     },
+        {
+        category: "Shows",
+        name: "Beastars",
+        cover: "https://i0.wp.com/psistillreadyou.wordpress.com/wp-content/uploads/2020/07/1_63twejnf5w6zlqrwgtbgsa.jpeg.jpg",
+        special: true,
+        note: "I NEED THE FINAL SEASON TO RELEASE",
+        review: "I honestly love how weird all the characters and some of the plot points are in this, genuinely just entertaining to watch but still feels deep and interesting.",
+        rating: 5
+    },
     {
         category: "Shows",
         name: "Mob Psycho 100",
@@ -188,9 +197,38 @@ const interestsData = [
     // --- Music ---
     {
         category: "Music",
-        name: "Hikes",
-        cover: "hiking.gif",
-        special: false,
-        note: ""
+        name: "beach life in death",
+        cover: "https://f4.bcbits.com/img/a3776947833_16.jpg",
+        special: true,
+        note: "#1 favorite song 3 years running",
+        review: "I've listened to this enough times that I can just play the full thing in my head perfectly without thinking about it, I like the original (Car Seat Headrest's) version too, but this one has been with me for years now as a favorite.",
+        rating: 5
+    },
+    {
+        category: "Music",
+        name: "Plastic Death",
+        cover: "https://runforcoverrecords.com/cdn/shop/files/GB-1000.jpg",
+        special: true,
+        note: "Oml Glass Beach is SO GOOD",
+        review: "Glass Beach has been my favorite artist for a while now, and I've AT LEAST listened to this album weekly since it dropped lol",
+        rating: 5
+    },
+    {
+        category: "Music",
+        name: "the first glass beach album",
+        cover: "https://f4.bcbits.com/img/a0854720793_10.jpg",
+        special: true,
+        note: "My introduction to Glass Beach",
+        review: "This has so many good songs in it, with Glass Beach definitely being my favorite. 10/10 would listen to it a million more times.",
+        rating: 5
+    },
+    {
+        category: "Music",
+        name: "Igor",
+        cover: "https://upload.wikimedia.org/wikipedia/en/5/51/Igor_-_Tyler%2C_the_Creator.jpg",
+        special: true,
+        note: "Igor my precious",
+        review: "The thing that got my into Tyler originally was his New Magic Wand performance at the Grammys, and since then I've listened to this album constantly. ",
+        rating: 5
     },
 ];
