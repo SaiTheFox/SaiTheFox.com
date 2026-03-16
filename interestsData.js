@@ -4,7 +4,7 @@ const interestsData = [
     {
         category: "General", // This just tells it which category to go under, all of this is one long list.
         name: "Hikes", // Title of the card
-        cover: "hiking.gif", // URL or path to the cover image
+        cover: "/Images/hiking.gif", // URL or path to the cover image
         special: true, // This gives it the outline 
         note: "", // This is the tiny note at the bottom
         review: "", // This is the review that shows up when you click the card
@@ -14,42 +14,42 @@ const interestsData = [
     {
         category: "General",
         name: "IT Stuff",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
     {
         category: "General",
         name: "Gaming",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
     {
         category: "General",
         name: "Music",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
     {
         category: "General",
         name: "Programming",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
     {
         category: "General",
         name: "Game Design",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
         {
         category: "General",
         name: "Art",
-        cover: "hiking.gif",
+        cover: "/Images/hiking.gif",
         special: true,
         note: ""
     },
