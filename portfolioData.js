@@ -49,17 +49,28 @@ const portfolioData = [
         ]
     },
     {
-        id: "rmm-system",
-        title: "RMM & Inventory System",
-        thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+        id: "winventory",
+        title: "WinVentory",
+        thumbnail: "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg",
         year: "2026",
-        shortDesc: "A professional Remote Monitoring and Management dashboard and inventory system.",
-        longDesc: "Built for enterprise IT infrastructure, this application serves as a central hub for tracking server health, managing computer inventory, and organizing networking equipment. It streamlines daily administrative tasks into one clean interface.",
+        shortDesc: "A professional reporting dashboard for tracking assets and what's on them pulling data from NinjaOne, AD, Intune (Microsoft Graphs), GLPI, Omnissa Horizon, and other APIs!",
+        longDesc: "I still need to write this tbh",
         link: "#",
         tags: ["ASP.NET", "HTML", "CSS"],
         gallery: [
-            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-            "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80"
+            "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg"        ]
+    },
+    {
+        id: "bscl",
+        title: "Beat Saber Challenge List",
+        thumbnail: "https://i.ytimg.com/vi/J9uVK4fp6vQ/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCfHV8YACcwy5d34pYp-JmHXF6CKw",
+        year: "2026",
+        shortDesc: "Basically the Geometry Dash Demon List but for Beat Saber challenge maps. Still a WIP.",
+        longDesc: "I still need to write this tbh",
+        link: "https://bschallengelist.com/",
+        tags: ["ASP.NET", "HTML", "CSS"],
+        gallery: [
+            "https://t3.ftcdn.net/jpg/05/04/28/96/360_F_504289605_zehJiK0tCuZLP2MdfFBpcJdOVxKLnXg1.jpg"
         ]
     }
 ];

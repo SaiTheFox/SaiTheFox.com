@@ -168,6 +168,15 @@ const interestsData = [
     },
     {
         category: "Shows",
+        name: "The Seven Deadly Sins",
+        cover: "https://m.media-amazon.com/images/M/MV5BODgxZGI4NjQtODViMy00Y2JmLWI1MTktNWExMjlmMmZhMzE3XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+        special: true,
+        note: "Peak since middle school",
+        review: "I started watching this when it first aired which definitely helps with just giving me nostalgia, but I do REALLY like this show. I feel like it does a really good job at getting you attached to all of the characters and keeping you on the edge of your seat, without actually killing them off or being too sad.",
+        rating: 5
+    },
+    {
+        category: "Shows",
         name: "Mob Psycho 100",
         cover: "https://m.media-amazon.com/images/M/MV5BYzU3NDM4ZjgtY2UyMi00YTczLTgyNDEtMjBiMDJlOGUxNjcxXkEyXkFqcGc@._V1_.jpg",
         special: false,
@@ -182,6 +191,15 @@ const interestsData = [
         special: false,
         note: "I love Ogami so much the goober crying at the festival is 10/10",
         review: "Honestly I really liked this show and the characters, it was silly enough to be casually enjoyable but also still had enough depth to keep me invested. Not an all time favorite but still actually really good.",
+        rating: 5
+    },
+    {
+        category: "Shows",
+        name: "My Daemon",
+        cover: "https://m.media-amazon.com/images/M/MV5BZDZjNTVlNzktZDQzMy00MGZlLWJlMmUtMThjY2NmMjZkOGYzXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg",
+        special: false,
+        note: "Pokemon but fucked up.",
+        review: "Honestly I really did like this show, but it was frustrating just how BAD like 95% of the characters were, basically everyone was an asshole lol",
         rating: 5
     },
 
